@@ -1,0 +1,4 @@
+Construcción y ejecución:
+
+docker build -t apache-evasive .
+docker run -d --rm -p 8080:80 -p 8081:443 --name="apache-dos" apache-evasive
