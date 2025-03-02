@@ -1,0 +1,16 @@
+FROM debian:latest
+
+# Instalamos Apache y el módulo de headers
+RUN apt-get update && apt-get install -y apache2 libapache2-mod-security2 && \
+    a2dismod autoindex && \
+    a2enmod headers ssl && \
+    apt-get clean
+
+# Copiamos la configuración personalizada
+COPY apache-config.conf /etc/apache2/sites-available/000-default.conf
+
+# Exponemos los puertos 80 y 443
+EXPOSE 80 443
+
+# Comando de inicio
+CMD ["apachectl", "-D", "FOREGROUND"]
