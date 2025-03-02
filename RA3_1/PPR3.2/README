@@ -1,0 +1,10 @@
+Construir y ejecutar
+
+docker build -t apache-ssl .
+
+docker run -d -p 80:80 -p 443:443 --name apache_ssl_server apache-ssl
+
+Si deseas cambiar el dominio por defecto (www.midominioseguro.com), edita el archivo default-ssl.conf y reemplaza:
+
+ServerName www.midominioseguro.com
+Redirect / https://www.midominioseguro.com/
