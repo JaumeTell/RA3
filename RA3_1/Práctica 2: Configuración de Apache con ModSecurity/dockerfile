@@ -1,0 +1,26 @@
+FROM debian:latest
+
+# Instalamos Apache y el módulo de headers
+RUN apt-get update && apt-get install -y apache2 libapache2-mod-security2 && \
+    a2dismod autoindex && \
+    a2enmod headers ssl && \
+    apt-get clean
+
+# Instalar mod_security y configurarlo
+RUN apt-get install -y libapache2-mod-security2 && \
+    cp /etc/modsecurity/modsecurity.conf-recommended /etc/modsecurity/modsecurity.conf && \
+    sed -i 's/SecRuleEngine DetectionOnly/SecRuleEngine On/' /etc/modsecurity/modsecurity.conf
+
+# Copiar reglas OWASP
+RUN git clone https://github.com/SpiderLabs/owasp-modsecurity-crs.git && \
+    mv owasp-modsecurity-crs/crs-setup.conf.example /etc/modsecurity/crs-setup.conf && \
+    mv owasp-modsecurity-crs/rules /etc/modsecurity/
+
+# Copiamos la configuración personalizada
+COPY apache-config.conf /etc/apache2/sites-available/000-default.conf
+
+# Exponemos los puertos 80 y 443
+EXPOSE 80 443
+
+# Comando de inicio
+CMD ["apachectl", "-D", "FOREGROUND"]
