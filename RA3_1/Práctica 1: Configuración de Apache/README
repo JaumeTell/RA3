@@ -1,0 +1,8 @@
+Ejecutar para construir el contenedor
+
+docker build -t apache-hardened .
+
+
+Ejecutar el contenedor
+
+docker run -d --rm -p 8080:80 -p 8081:443 --name="hardenowasp" apache-hardened
