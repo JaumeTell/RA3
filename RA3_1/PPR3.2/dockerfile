@@ -1,0 +1,33 @@
+FROM ubuntu:latest
+
+# Instalamos Apache y OpenSSL
+RUN apt-get update && apt-get install -y apache2 openssl
+
+# Habilitamos el módulo SSL en Apache
+RUN a2enmod ssl
+
+# Creamos el directorio para los certificados
+RUN mkdir /etc/apache2/ssl
+
+# Generamos un certificado SSL autofirmado
+RUN openssl req -x509 -nodes -days 365 \
+    -newkey rsa:2048 \
+    -keyout /etc/apache2/ssl/apache.key \
+    -out /etc/apache2/ssl/apache.crt \
+    -subj "/C=ES/ST=Castellon/L=Castellon de la Plana/O=Caminas Web Projects/OU=Department of Server Development/CN=www.midominioseguro.com"
+
+# Copiamos la configuración SSL de Apache
+COPY default-ssl.conf /etc/apache2/sites-available/default-ssl.conf
+
+# Activamos el sitio con SSL
+RUN a2ensite default-ssl.conf
+
+# Redirigir HTTP a HTTPS
+RUN echo '<VirtualHost *:80>\n \tServerName www.midominioseguro.com\n \tRedirect / https://www.midominioseguro.com/\n</VirtualHost>' > /etc/apache2/sites-available/redirect.conf && \
+    a2ensite redirect.conf
+
+# Exponemos los puertos 80 y 443
+EXPOSE 80 443
+
+# Reiniciamos Apache
+CMD ["apachectl", "-D", "FOREGROUND"]
