@@ -1,0 +1,4 @@
+# Instalar mod_evasive
+RUN apt-get install -y libapache2-mod-evasive && \
+    mkdir -p /var/log/mod_evasive/ && \
+    chown -R www-data:www-data /var/log/mod_evasive/
